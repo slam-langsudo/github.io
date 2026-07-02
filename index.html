@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>나만의 메모장</title>
+
+<style>
+  :root {
+    --font-size: 18px;
+    --line-height: 1.8;
+    --letter-spacing: 0px;
+    --page-width: 760px;
+    --bg-color: #f7f3ea;
+    --text-color: #1f1f1f;
+    --paper-color: transparent;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  }
+
+  .toolbar {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(920px, calc(100% - 24px));
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  .toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .toolbar input[type="range"] {
+    width: 80px;
+  }
+
+  .toolbar button {
+    border: 1px solid rgba(0,0,0,0.18);
+    background: #fff;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .toolbar button:hover {
+    background: #f0f0f0;
+  }
+
+  .page {
+    width: min(var(--page-width), calc(100% - 32px));
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 110px 0 160px;
+  }
+
+  .editor {
+    width: 100%;
+    min-height: 70vh;
+    outline: none;
+    background: var(--paper-color);
+    color: var(--text-color);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    letter-spacing: var(--letter-spacing);
+    white-space: pre-wrap;
+    word-break: keep-all;
+  }
+
+  .editor:empty::before {
+    content: "여기에 쓰기...";
+    color: rgba(0,0,0,0.32);
+  }
+
+  .counter {
+    position: fixed;
+    right: 18px;
+    bottom: 14px;
+    font-size: 12px;
+    color: rgba(0,0,0,0.45);
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 999px;
+    padding: 6px 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  body.dark {
+    --bg-color: #151515;
+    --text-color: #e8e1d7;
+  }
+
+  body.dark .toolbar {
+    background: rgba(30, 30, 30, 0.75);
+    border-color: rgba(255,255,255,0.14);
+  }
+
+  body.dark .toolbar label {
+    color: #e8e1d7;
+  }
+
+  body.dark .toolbar button {
+    background: #242424;
+    color: #e8e1d7;
+    border-color: rgba(255,255,255,0.18);
+  }
+
+  body.dark .editor:empty::before {
+    color: rgba(255,255,255,0.32);
+  }
+
+  body.dark .counter {
+    color: rgba(255,255,255,0.55);
+    background: rgba(30,30,30,0.65);
+    border-color: rgba(255,255,255,0.12);
+  }
+</style>
+</head>
+
+<body>
+  <div class="toolbar">
+    <label>
+      글씨
+      <input id="fontSize" type="range" min="12" max="34" value="18">
+    </label>
+
+    <label>
+      행간
+      <input id="lineHeight" type="range" min="1.2" max="2.8" step="0.1" value="1.8">
+    </label>
+
+    <label>
+      자간
+      <input id="letterSpacing" type="range" min="-1" max="5" step="0.1" value="0">
+    </label>
+
+    <label>
+      줄폭
+      <input id="pageWidth" type="range" min="420" max="1100" value="760">
+    </label>
+
+    <button id="darkBtn">밤 모드</button>
+    <button id="clearBtn">비우기</button>
+  </div>
+
+  <div class="page">
+    <main id="editor" class="editor" contenteditable="true" spellcheck="false"></main>
+  </div>
+
+  <div id="counter" class="counter">0자</div>
+
+<script>
+  const root = document.documentElement;
+  const body = document.body;
+  const editor = document.getElementById("editor");
+  const counter = document.getElementById("counter");
+
+  const controls = {
+    fontSize: document.getElementById("fontSize"),
+    lineHeight: document.getElementById("lineHeight"),
+    letterSpacing: document.getElementById("letterSpacing"),
+    pageWidth: document.getElementById("pageWidth")
+  };
+
+  const savedText = localStorage.getItem("memo-text");
+  const savedSettings = JSON.parse(localStorage.getItem("memo-settings") || "{}");
+  const savedDark = localStorage.getItem("memo-dark");
+
+  if (savedText) {
+    editor.innerText = savedText;
+  }
+
+  if (savedDark === "true") {
+    body.classList.add("dark");
+  }
+
+  Object.keys(controls).forEach(key => {
+    if (savedSettings[key]) {
+      controls[key].value = savedSettings[key];
+    }
+  });
+
+  function applySettings() {
+    root.style.setProperty("--font-size", controls.fontSize.value + "px");
+    root.style.setProperty("--line-height", controls.lineHeight.value);
+    root.style.setProperty("--letter-spacing", controls.letterSpacing.value + "px");
+    root.style.setProperty("--page-width", controls.pageWidth.value + "px");
+
+    localStorage.setItem("memo-settings", JSON.stringify({
+      fontSize: controls.fontSize.value,
+      lineHeight: controls.lineHeight.value,
+      letterSpacing: controls.letterSpacing.value,
+      pageWidth: controls.pageWidth.value
+    }));
+  }
+
+  function updateCounter() {
+    const text = editor.innerText || "";
+    counter.textContent = text.length + "자";
+  }
+
+  Object.values(controls).forEach(input => {
+    input.addEventListener("input", applySettings);
+  });
+
+  editor.addEventListener("input", () => {
+    localStorage.setItem("memo-text", editor.innerText);
+    updateCounter();
+  });
+
+  document.getElementById("darkBtn").addEventListener("click", () => {
+    body.classList.toggle("dark");
+    localStorage.setItem("memo-dark", body.classList.contains("dark"));
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    const ok = confirm("진짜 전부 지울까?");
+    if (ok) {
+      editor.innerText = "";
+      localStorage.removeItem("memo-text");
+      updateCounter();
+    }
+  });
+
+  applySettings();
+  updateCounter();
+</script>
+</body>
+</html>
