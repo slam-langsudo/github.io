@@ -1,254 +1,63 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>나만의 메모장</title>
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --font-size: 18px;
-    --line-height: 1.8;
-    --letter-spacing: 0px;
-    --page-width: 760px;
-    --bg-color: #f7f3ea;
-    --text-color: #1f1f1f;
-    --paper-color: transparent;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    background: var(--bg-color);
-    color: var(--text-color);
-    font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
-  }
-
-  .toolbar {
-    position: fixed;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(920px, calc(100% - 24px));
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 999px;
-    backdrop-filter: blur(14px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    z-index: 10;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  }
-
-  .toolbar label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-
-  .toolbar input[type="range"] {
-    width: 80px;
-  }
-
-  .toolbar button {
-    border: 1px solid rgba(0,0,0,0.18);
-    background: #fff;
-    border-radius: 999px;
-    padding: 5px 10px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .toolbar button:hover {
-    background: #f0f0f0;
-  }
-
-  .page {
-    width: min(var(--page-width), calc(100% - 32px));
-    min-height: 100vh;
-    margin: 0 auto;
-    padding: 110px 0 160px;
-  }
-
-  .editor {
-    width: 100%;
-    min-height: 70vh;
-    outline: none;
-    background: var(--paper-color);
-    color: var(--text-color);
-    font-size: var(--font-size);
-    line-height: var(--line-height);
-    letter-spacing: var(--letter-spacing);
-    white-space: pre-wrap;
-    word-break: keep-all;
-  }
-
-  .editor:empty::before {
-    content: "여기에 쓰기...";
-    color: rgba(0,0,0,0.32);
-  }
-
-  .counter {
-    position: fixed;
-    right: 18px;
-    bottom: 14px;
-    font-size: 12px;
-    color: rgba(0,0,0,0.45);
-    background: rgba(255,255,255,0.6);
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 999px;
-    padding: 6px 10px;
-    backdrop-filter: blur(10px);
-  }
-
-  body.dark {
-    --bg-color: #151515;
-    --text-color: #e8e1d7;
-  }
-
-  body.dark .toolbar {
-    background: rgba(30, 30, 30, 0.75);
-    border-color: rgba(255,255,255,0.14);
-  }
-
-  body.dark .toolbar label {
-    color: #e8e1d7;
-  }
-
-  body.dark .toolbar button {
-    background: #242424;
-    color: #e8e1d7;
-    border-color: rgba(255,255,255,0.18);
-  }
-
-  body.dark .editor:empty::before {
-    color: rgba(255,255,255,0.32);
-  }
-
-  body.dark .counter {
-    color: rgba(255,255,255,0.55);
-    background: rgba(30,30,30,0.65);
-    border-color: rgba(255,255,255,0.12);
-  }
-</style>
-</head>
-
+:root{--font-size:18px;--line-height:1.8;--letter-spacing:-.3px;--page-width:760px;--font-scale:1;--font-family:"Pretendard","Noto Sans KR",sans-serif;--bg:#f7f3ea;--fg:#222}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:sans-serif}
+.toolbar{position:fixed;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:nowrap;width:min(1200px,calc(100% - 24px));justify-content:center;overflow-x:auto;background:#ffffffdd;padding:10px;border-radius:18px;backdrop-filter:blur(10px);z-index:9}
+.toolbar label,.toolbar select,.toolbar button{font-size:12px}
+.page{width:min(var(--page-width),calc(100% - 32px));margin:auto;padding:140px 0 120px}
+.editor{min-height:75vh;outline:none;font-size:var(--font-size);line-height:var(--line-height);letter-spacing:var(--letter-spacing);font-family:var(--font-family);transform:scaleX(var(--font-scale));transform-origin:left top;white-space:pre-wrap;word-break:keep-all}
+.editor:empty:before{content:"여기에 쓰기...";color:#888}
+.counter{position:fixed;right:15px;bottom:15px;background:#fff;padding:6px 10px;border-radius:20px}
+.dark{--bg:#151515;--fg:#eee}
+</style></head>
 <body>
-  <div class="toolbar">
-    <label>
-      글씨
-      <input id="fontSize" type="range" min="12" max="34" value="18">
-    </label>
-
-    <label>
-      행간
-      <input id="lineHeight" type="range" min="1.2" max="2.8" step="0.1" value="1.8">
-    </label>
-
-    <label>
-      자간
-      <input id="letterSpacing" type="range" min="-1" max="5" step="0.1" value="0">
-    </label>
-
-    <label>
-      줄폭
-      <input id="pageWidth" type="range" min="420" max="1100" value="760">
-    </label>
-
-    <button id="darkBtn">밤 모드</button>
-    <button id="clearBtn">비우기</button>
-  </div>
-
-  <div class="page">
-    <main id="editor" class="editor" contenteditable="true" spellcheck="false"></main>
-  </div>
-
-  <div id="counter" class="counter">0자</div>
-
+<div class="toolbar">
+<label>글꼴<select id="fontFamily">
+<option value='"Pretendard","Noto Sans KR",sans-serif'>Pretendard</option>
+<option value='"Noto Sans KR",sans-serif'>Noto Sans KR</option>
+<option value='"Noto Serif KR",serif'>Noto Serif KR</option>
+<option value='NanumMyeongjo,serif'>나눔명조</option>
+<option value='"Malgun Gothic",sans-serif'>맑은 고딕</option>
+</select></label>
+<label>글씨<input id=fz type=range min=12 max=34 value=18></label>
+<label>행간<input id=lh type=range min=1.2 max=2.8 step=.1 value=1.8></label>
+<label>자간<input id=ls type=range min=-2 max=5 step=.1 value=-0.3></label>
+<label>장평<input id=sc type=range min=.85 max=1.15 step=.01 value=1></label>
+<label>줄폭<input id=pw type=range min=420 max=1100 value=760></label>
+<button id=dark>밤모드</button><button id=clear>비우기</button>
+</div>
+<div class=page><main id=ed class=editor contenteditable spellcheck=false></main></div>
+<div id=cnt class=counter>0자</div>
 <script>
-  const root = document.documentElement;
-  const body = document.body;
-  const editor = document.getElementById("editor");
-  const counter = document.getElementById("counter");
-
-  const controls = {
-    fontSize: document.getElementById("fontSize"),
-    lineHeight: document.getElementById("lineHeight"),
-    letterSpacing: document.getElementById("letterSpacing"),
-    pageWidth: document.getElementById("pageWidth")
-  };
-
-  const savedText = localStorage.getItem("memo-text");
-  const savedSettings = JSON.parse(localStorage.getItem("memo-settings") || "{}");
-  const savedDark = localStorage.getItem("memo-dark");
-
-  if (savedText) {
-    editor.innerText = savedText;
-  }
-
-  if (savedDark === "true") {
-    body.classList.add("dark");
-  }
-
-  Object.keys(controls).forEach(key => {
-    if (savedSettings[key]) {
-      controls[key].value = savedSettings[key];
-    }
-  });
-
-  function applySettings() {
-    root.style.setProperty("--font-size", controls.fontSize.value + "px");
-    root.style.setProperty("--line-height", controls.lineHeight.value);
-    root.style.setProperty("--letter-spacing", controls.letterSpacing.value + "px");
-    root.style.setProperty("--page-width", controls.pageWidth.value + "px");
-
-    localStorage.setItem("memo-settings", JSON.stringify({
-      fontSize: controls.fontSize.value,
-      lineHeight: controls.lineHeight.value,
-      letterSpacing: controls.letterSpacing.value,
-      pageWidth: controls.pageWidth.value
-    }));
-  }
-
-  function updateCounter() {
-    const text = editor.innerText || "";
-    counter.textContent = text.length + "자";
-  }
-
-  Object.values(controls).forEach(input => {
-    input.addEventListener("input", applySettings);
-  });
-
-  editor.addEventListener("input", () => {
-    localStorage.setItem("memo-text", editor.innerText);
-    updateCounter();
-  });
-
-  document.getElementById("darkBtn").addEventListener("click", () => {
-    body.classList.toggle("dark");
-    localStorage.setItem("memo-dark", body.classList.contains("dark"));
-  });
-
-  document.getElementById("clearBtn").addEventListener("click", () => {
-    const ok = confirm("진짜 전부 지울까?");
-    if (ok) {
-      editor.innerText = "";
-      localStorage.removeItem("memo-text");
-      updateCounter();
-    }
-  });
-
-  applySettings();
-  updateCounter();
-</script>
-</body>
-</html>
+const r=document.documentElement,b=document.body,e=ed;
+const c={fz,lh,ls,pw,sc,fontFamily};
+const S=JSON.parse(localStorage.memoSettings||"{}");
+Object.keys(c).forEach(k=>{if(S[k]!=null)c[k].value=S[k]});
+if(localStorage.memoText)e.innerText=localStorage.memoText;
+if(localStorage.memoDark==="1")b.classList.add("dark");
+function apply(){
+r.style.setProperty("--font-size",fz.value+"px");
+r.style.setProperty("--line-height",lh.value);
+r.style.setProperty("--letter-spacing",ls.value+"px");
+r.style.setProperty("--page-width",pw.value+"px");
+r.style.setProperty("--font-scale",sc.value);
+r.style.setProperty("--font-family",fontFamily.value);
+localStorage.memoSettings=JSON.stringify({fz:fz.value,lh:lh.value,ls:ls.value,pw:pw.value,sc:sc.value,fontFamily:fontFamily.value});
+}
+function upd(){cnt.textContent=(e.innerText||"").length+"자";}
+Object.values(c).forEach(x=>x.oninput=apply);
+e.oninput=()=>{localStorage.memoText=e.innerText;upd();}
+dark.onclick=()=>{b.classList.toggle("dark");localStorage.memoDark=b.classList.contains("dark")?"1":"0";}
+clear.onclick=()=>{if(confirm("모두 삭제할까요?")){e.innerText="";localStorage.removeItem("memoText");upd();}}
+e.addEventListener("paste",ev=>{ev.preventDefault();document.execCommand("insertText",false,(ev.clipboardData||window.clipboardData).getData("text"));});
+e.addEventListener("keydown",ev=>{if(ev.key==="Tab"){ev.preventDefault();document.execCommand("insertText",false,"    ");}if(ev.ctrlKey&&ev.key==="s"){ev.preventDefault();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([e.innerText],{type:"text/plain"}));a.download="memo.txt";a.click();}});
+apply();upd();
+</script></body></html>
